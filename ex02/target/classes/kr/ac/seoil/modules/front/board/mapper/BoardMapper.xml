@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.seoil.modules.front.board.mapper.BoardMapper">
+	<select id="selectList" resultType="kr.ac.seoil.modules.front.board.vo.BoardVO">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.selectList */
+		SELECT BNO
+			, TITLE
+			, WRITER
+			, REG_DATE
+			, MOD_DATE
+		FROM TBL_BOARD
+		WHERE BNO > 0
+	]]>
+	</select>
+	
+	<insert id="insert">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insert */
+		INSERT INTO TBL_BOARD (
+			BNO,
+			TITLE,
+			CONTENT,
+			WRITER
+		) VALUES (
+			SEQ_BOARD.NEXTVAL
+			, #{title}
+			, #{content}
+			, #{writer}
+		)
+	]]>
+	</insert>
+	
+	<insert id="insertSelectKey">
+		<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+			SELECT SEQ_BOARD.NEXTVAL FROM DUAL
+		</selectKey>
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insert */
+		INSERT INTO TBL_BOARD (
+			BNO,
+			TITLE,
+			CONTENT,
+			WRITER
+		) VALUES (
+			#{bno}
+			, #{title}
+			, #{content}
+			, #{writer}
+		)
+	]]>	
+	</insert>
+	
+	<delete id="delete">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.delete */
+		DELETE FROM TBL_BOARD
+		WHERE BNO = #{bno}
+	]]>
+	</delete>
+	
+	<update id="update">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.update */
+		UPDATE TBL_BOARD SET
+		TITLE = #{title},
+		CONTENT = #{content},
+		WRITER = #{writer},
+		MOD_DATE = sysdate
+		WHERE bno = #{bno}
+	]]>
+	</update>
+	
+
+	<select id="selectInfo" resultType="kr.ac.seoil.modules.front.board.vo.BoardVO">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insert */
+		SELECT BNO,
+			TITLE,
+			CONTENT,
+			WRITER,
+			REG_DATE REGDATE,
+			MOD_DATE MODDATE
+		FROM TBL_BOARD
+		WHERE BNO = #{bno}
+	]]>
+	</select>
+	
+</mapper>
