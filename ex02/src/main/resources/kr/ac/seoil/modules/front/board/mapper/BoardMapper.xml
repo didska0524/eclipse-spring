@@ -9,12 +9,83 @@
 		SELECT BNO
 			, TITLE
 			, WRITER
-			, REG_DATE
-			, MOD_DATE
+			, REG_DATE REGDATE
+			, MOD_DATE MODDATE
 		FROM TBL_BOARD
 		WHERE BNO > 0
 	]]>
 	</select>
+	
+	<select id="selectTotalCount" resultType="int">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.selectTotalCount */
+		SELECT COUNT(BNO) FROM TBL_BOARD
+		where
+	]]>
+		<include refid="criteria"></include>
+	<![CDATA[
+		bno > 0
+	]]>
+	</select>
+	
+	<select id="selectListWithPaging" resultType="kr.ac.seoil.modules.front.board.vo.BoardVO">
+		<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.selectListWithPaging */
+		with v_data as (
+	    	SELECT /*+ INDEX_DESC(TBL_BOARD PK_TBL_BOARD)*/
+		    	rownum rn
+		    	, bno
+				, title
+				, writer
+		    	, content
+		    	, reg_date regDate
+		    	, mod_date modDate
+		    FROM TBL_BOARD
+		    where
+	]]>
+	<include refid="criteria"></include>
+	<![CDATA[
+			rownum <= #{pageNum} * #{amount}
+		)
+		select * from v_data
+		where rn > (#{pageNum}-1) * #{amount}
+	]]>
+	</select>
+	
+	<sql id="criteria">
+		<trim prefix="(" suffix=") AND" prefixOverrides="OR">
+			<foreach item= 'type' collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'T'.toString()">
+							(title like '%'||#{keyword}|| '%')
+						</when>
+						<when test="type == 'C'.toString()">
+							(content like '%'||#{keyword}||'%')
+						</when>
+						<when test="type == 'W'.toString()">
+							(writer like '%'||#{keyword}|| '%')
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+	
+	<select id="selectInfo" resultType="kr.ac.seoil.modules.front.board.vo.BoardVO">
+	<![CDATA[
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.selectInfo */
+		SELECT BNO,
+			TITLE,
+			CONTENT,
+			WRITER,
+			REG_DATE REGDATE,
+			MOD_DATE MODDATE
+		FROM TBL_BOARD
+		WHERE BNO = #{bno}
+	]]>
+	</select>
+	
 	
 	<insert id="insert">
 	<![CDATA[
@@ -38,7 +109,7 @@
 			SELECT SEQ_BOARD.NEXTVAL FROM DUAL
 		</selectKey>
 	<![CDATA[
-		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insert */
+		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insertSelectKey */
 		INSERT INTO TBL_BOARD (
 			BNO,
 			TITLE,
@@ -65,27 +136,25 @@
 	<![CDATA[
 		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.update */
 		UPDATE TBL_BOARD SET
-		TITLE = #{title},
-		CONTENT = #{content},
-		WRITER = #{writer},
-		MOD_DATE = sysdate
+		TITLE = #{title}
+		, CONTENT = #{content}
+		, MOD_DATE = sysdate
 		WHERE bno = #{bno}
 	]]>
 	</update>
 	
-
-	<select id="selectInfo" resultType="kr.ac.seoil.modules.front.board.vo.BoardVO">
+	<select id="test" resultType="int">
 	<![CDATA[
-		/* kr.ac.seoil.modules.front.board.mapper.BoardMapper.insert */
-		SELECT BNO,
-			TITLE,
-			CONTENT,
-			WRITER,
-			REG_DATE REGDATE,
-			MOD_DATE MODDATE
-		FROM TBL_BOARD
-		WHERE BNO = #{bno}
-	]]>
+		select count(*) from tbl_board
+	]]>	
+	<where>
+		<if test="bno != null">
+			<![CDATA[bno = #{bno}]]>
+		</if>
+		<trim prefix ="and" >
+			<![CDATA[rownum = 1]]>
+		</trim>
+	</where>
 	</select>
 	
 </mapper>

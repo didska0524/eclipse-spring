@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import kr.ac.seoil.modules.common.pages.vo.Criteria;
 import kr.ac.seoil.modules.front.board.mapper.BoardMapper;
 import kr.ac.seoil.modules.front.board.service.BoardService;
 import kr.ac.seoil.modules.front.board.vo.BoardVO;
@@ -23,6 +24,16 @@ public class BoardServiceImpl implements BoardService{
 	@Override
 	public List<BoardVO> getList() throws Exception {
 		return boardMapper.selectList();
+	}
+	
+	@Override
+	public int getTotalCount(Criteria cri) throws Exception {
+		return boardMapper.selectTotalCount(cri);
+	}
+	
+	@Override
+	public List<BoardVO> getListWithPaging(Criteria cri) throws Exception {
+		return boardMapper.selectListWithPaging(cri);			
 	}
 
 	@Override
@@ -49,5 +60,5 @@ public class BoardServiceImpl implements BoardService{
 	public int modify(BoardVO boardVO) throws Exception {
 		return boardMapper.update(boardVO);
 	}
-	
+
 }
